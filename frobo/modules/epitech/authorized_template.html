@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Authorization Response</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@200&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body, h1, h2 {
+            margin: 0;
+            font-weight: 200;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        body {
+            background: #1D2021;
+            color: #EBDBB2;
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-transform: capitalize;
+        }
+
+        body.error {
+            color: #FB4934;
+        }
+
+        h2 {
+            color: #A89984;
+        }
+
+        .error h2 {
+            color: #CC241D;
+        }
+
+        .material-icons {
+            font-size: 10em;
+            transform: rotateZ(-25deg);
+        }
+    </style>
+</head>
+<body class="%CLASS%">
+    <span class="material-icons">%ICON%</span>
+    <h1>%TITLE%</h1>
+    <h2>%SUBTITLE%</h2>
+</body>
+</html>
