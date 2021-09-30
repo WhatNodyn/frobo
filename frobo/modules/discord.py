@@ -405,7 +405,7 @@ class Roles(frobo.Cog):
         await ctx.defer()
         query = sqlalchemy.select(self.Rule).where(self.Rule.guild == str(ctx.guild_id))
         if role is not None:
-            query = query.where(self.Rule.role == role.id)
+            query = query.where(self.Rule.role == str(role.id))
         query = query.order_by('role')
         last_role_id = None
         contents = '```\n'
@@ -429,10 +429,11 @@ class Roles(frobo.Cog):
             contents += '\n'
 
         if contents == '```\n':
-            await ctx.send('⚠️ No rules set up yet!')
+            contents = '⚠️ No rules set up yet!'
             return
+        else:
+            contents += '```\n\n'
 
-        contents += '```\n\n'
         if orphaned > 0:
             contents += f'⚠️ {orphaned} orphaned rules found, run `/roles update` to remove them'
         await ctx.send(contents)
