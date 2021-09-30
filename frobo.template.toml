@@ -1,0 +1,25 @@
+[discord]
+# The bot token provided by the Discord developer portal
+token = ""
+
+# The guild to use for command development purposes
+# debug-guild = ""
+
+[sql]
+# The SQLAlchemy URL to the database
+uri = ""
+
+[web]
+# The public base path for user-facing URIs
+root-uri = ""
+
+[epitech.azure]
+# The Microsoft tenant ID for the organization
+tenant = ""
+
+# The client ID provided by the Azure portal
+client-id = ""
+
+[epitech.intra]
+# An autologin token for an account with /user/ rights 
+token = ""
