@@ -298,8 +298,8 @@ class Roles(frobo.Cog):
     @sql.model('rules')
     class Rule:
         id        : sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-        guild     : sqlalchemy.Column(sqlalchemy.Integer)
-        role      : sqlalchemy.Column(sqlalchemy.Integer)
+        guild     : sqlalchemy.Column(sqlalchemy.String)
+        role      : sqlalchemy.Column(sqlalchemy.String)
         conditions: sqlalchemy.orm.relationship('Condition', cascade='all, delete, delete-orphan')
 
     async def show_progress(self, ctx, label, progress, total, extra='', smsg=None):
@@ -316,7 +316,7 @@ class Roles(frobo.Cog):
     async def update_user(self, ctx, session, member, progress=False, guild=None):
         # TODO: User interactions
         guild = guild if guild else ctx.guild
-        query = sqlalchemy.select(self.Rule).where(self.Rule.guild == guild.id).order_by('role')
+        query = sqlalchemy.select(self.Rule).where(self.Rule.guild == str(guild.id)).order_by('role')
         rules = list(map(lambda r: r[0], session.execute(query)))
         to_unapply = set(map(lambda r: r.role, rules))
         to_apply = set()
@@ -381,7 +381,7 @@ class Roles(frobo.Cog):
             ))
 
         rule = self.Rule(
-            guild=ctx.guild_id,
+            guild=str(ctx.guild_id),
             role=role.id,
             conditions=conditions,
         )

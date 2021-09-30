@@ -148,7 +148,7 @@ class Registrations(frobo.Cog):
     )
     async def login(self, ctx, sql: sql.session):
         await ctx.defer(hidden=True)
-        sql.execute(sqlalchemy.delete(self.Interaction).where(self.Interaction.user == ctx.author_id))
+        sql.execute(sqlalchemy.delete(self.Interaction).where(self.Interaction.user == str(ctx.author_id)))
         sql.add(self.Interaction(
             snowflake=ctx.interaction_id,
             guild=ctx.guild_id,

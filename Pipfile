@@ -11,6 +11,7 @@ aiohttp = "*"
 pyjwt = {extras = ["crypto"], version = "*"}
 node-semver = "*"
 toml = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
