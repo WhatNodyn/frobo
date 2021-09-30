@@ -174,8 +174,15 @@ class Registrations(frobo.Cog):
             create_option('user', description='The user you want to know the login of', option_type=6, required=True),
         ],
     )
-    async def whois(self, ctx):
-        # TODO: Implement
-        ...
+    async def whois(self, ctx, user, sql: sql.session):
+        await ctx.defer(hidden=True)
+        query = sqlalchemy.select(self.EpitechUser).where(self.EpitechUser.discord == str(user.id))
+        result = sql.execute(query)
+        logins = list(map(lambda row: f'    - {row[0].azure}', result))
+        text = '\n'.join(logins)
+
+        if len(logins) == 0:
+            return await ctx.send('⚠️ No logins found', hidden=True)
+        await ctx.send(f'🔎 The following logins were found:\n{text}', hidden=True)
 
     
