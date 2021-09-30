@@ -34,6 +34,11 @@ def do_test(real_value, condition, expected_value):
     elif condition == '!':
         # Exact difference
         return str(real_value) != expected_value
+    elif real_value is None:
+        # Past this, nothing can return true with a None, and
+        # since we treat the value as a string at all times, we better
+        # shortcircuit here
+        return False
     elif condition == '<':
         # Lesser than or equal to
         try:
@@ -58,6 +63,8 @@ def do_test(real_value, condition, expected_value):
     elif condition == '%':
         # Contains
         return expected_value in str(real_value)
+    elif condition == '@':
+        return expected_value not in str(real_value) 
 
 def find_by(permissions, pred, default=None):
     for perm in permissions:
@@ -287,7 +294,7 @@ class Permissions(frobo.Cog):
 class Roles(frobo.Cog):
     dependencies = ['discord.client', 'sql']
 
-    CONDITION_FMT = re.compile(r'\s*(?P<key>[^\s=!<>\^\$\~%]+)\s*(?P<cond>[=!<>\^\$\~%])=\s*("(?P<quoted>[^"]*)"|(?P<value>\S+))')
+    CONDITION_FMT = re.compile(r'\s*(?P<key>[^\s=!<@>\^\$\~%]+)\s*(?P<cond>[=!<@>\^\$\~%])=\s*("(?P<quoted>[^"]*)"|(?P<value>\S+))')
 
     @sql.model('conditions')
     class Condition:
