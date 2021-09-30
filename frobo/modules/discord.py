@@ -410,13 +410,12 @@ class Roles(frobo.Cog):
         last_role_id = None
         contents = '```\n'
 
-        await ctx.guild.fetch_roles()
         orphaned = 0
         for row in session.execute(query):
             row = row[0]
             if last_role_id != row.role:
                 last_role_id = row.role
-                role = ctx.guild.get_role(row.role)
+                role = ctx.guild.get_role(int(row.role))
                 if role is None:
                     last_role_id = None
                     orphaned += 1
@@ -427,10 +426,8 @@ class Roles(frobo.Cog):
             for condition in row.conditions:
                 contents += f' {condition.key} {condition.cond}= {condition.value}'
             contents += '\n'
-
         if contents == '```\n':
             contents = '⚠️ No rules set up yet!'
-            return
         else:
             contents += '```\n\n'
 
