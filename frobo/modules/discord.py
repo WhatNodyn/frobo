@@ -326,7 +326,8 @@ class Roles(frobo.Cog):
      
 
     async def update_user(self, ctx, session, user, progress=False, guild=None):
-        # TODO: User interactions
+        if progress and ctx is not None:
+            await ctx.defer(hidden=True)
         guild = guild if guild else (ctx.guild if ctx is not None else None)
         query = sqlalchemy.select(self.Rule)
         if guild is not None:
@@ -361,6 +362,8 @@ class Roles(frobo.Cog):
                 continue
             await member.remove_roles(*map(lambda x: discord.utils.get(guild.roles, id=int(x)), to_unapply.get(guild_id, set())))
             await member.add_roles(*map(lambda x: discord.utils.get(guild.roles, id=int(x)), to_apply.get(guild_id, set())))
+        if progress and ctx is not None:
+            await ctx.send('\u2705 User updated successfully!')
 
     async def update_role(self, ctx, session, role, progress=False):
         # TODO: Implement
