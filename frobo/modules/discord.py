@@ -2,6 +2,7 @@ import discord
 import discord_slash, discord_slash.cog_ext
 import frobo
 import functools
+import itertools
 import re
 import sqlalchemy, sqlalchemy.orm
 from discord_slash.utils.manage_commands import create_option, get_all_commands
@@ -294,6 +295,8 @@ class Permissions(frobo.Cog):
 class Roles(frobo.Cog):
     dependencies = ['discord.client', 'sql']
 
+    client: discord.client
+
     CONDITION_FMT = re.compile(r'\s*(?P<key>[^\s=!<@>\^\$\~%]+)\s*(?P<cond>[=!<@>\^\$\~%])=\s*("(?P<quoted>[^"]*)"|(?P<value>\S+))')
 
     @sql.model('conditions')
@@ -322,28 +325,42 @@ class Roles(frobo.Cog):
         return await ctx.send(text)
      
 
-    async def update_user(self, ctx, session, member, progress=False, guild=None):
+    async def update_user(self, ctx, session, user, progress=False, guild=None):
         # TODO: User interactions
-        guild = guild if guild else ctx.guild
-        query = sqlalchemy.select(self.Rule).where(self.Rule.guild == str(guild.id)).order_by('role')
+        guild = guild if guild else (ctx.guild if ctx is not None else None)
+        query = sqlalchemy.select(self.Rule)
+        if guild is not None:
+            query = query.where(self.Rule.guild == str(guild.id))
+        query = query.order_by('role')
         rules = list(map(lambda r: r[0], session.execute(query)))
-        to_unapply = set(map(lambda r: r.role, rules))
-        to_apply = set()
+        to_unapply = {}
+        to_apply = {}
+        for rule in rules:
+            to_unapply.setdefault(rule.guild, set()).add(rule.role)
+
+        set(map(lambda r: (r.guild, r.role), rules))
 
         profile = {}
         for profile_entry in self.core.registered('discord.roles.profile'):
-            profile[profile_entry.args[0]] = await profile_entry.wrapped(member)
+            profile[profile_entry.args[0]] = await profile_entry.wrapped(user)
         for rule in rules:
             matched = True
             for condition in rule.conditions:
                 real_value = get_profile_value(profile, condition.key)
                 matched = matched and do_test(real_value, condition.cond, condition.value)
             if matched:
-                to_apply.add(rule.role)
-                to_unapply.remove(rule.role)
- 
-        await member.remove_roles(*map(lambda x: discord.utils.get(guild.roles, id=int(x)), to_unapply))
-        await member.add_roles(*map(lambda x: discord.utils.get(guild.roles, id=int(x)), to_apply))
+                to_apply.setdefault(rule.guild, set()).add(rule.role)
+                to_unapply.setdefault(rule.guild, set()).remove(rule.role)
+
+        for guild_id in set(itertools.chain(to_apply.keys(), to_unapply.keys())):
+            guild = self.client.client.get_guild(guild_id)
+            if guild is None:
+                continue
+            member = guild.get_member(user.id)
+            if member is None:
+                continue
+            await member.remove_roles(*map(lambda x: discord.utils.get(guild.roles, id=int(x)), to_unapply.get(guild_id, set())))
+            await member.add_roles(*map(lambda x: discord.utils.get(guild.roles, id=int(x)), to_apply.get(guild_id, set())))
 
     async def update_role(self, ctx, session, role, progress=False):
         # TODO: Implement

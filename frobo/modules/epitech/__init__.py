@@ -102,13 +102,7 @@ class Registrations(frobo.Cog):
             ))
             sql.commit()
             sql.flush()
-            guild = self.discord.client.get_guild(int(interaction.guild))
-            if guild is None:
-                return self.render(400, 'Guild not found', "Either the bot left the guild or you're up to shenanigans")
-            member = guild.get_member(int(user_id))
-            if member is None:
-                return self.render(400, 'Member not found', "Were you just banned?")
-            await self.roles.update_user(None, sql, member, guild=guild)
+            await self.roles.update_user(None, sql, self.discord.client.get_user(int(user_id)))
             
         if 'state' in data:
             query = sqlalchemy.delete(self.Interaction).where(self.Interaction.snowflake == data['state'])
