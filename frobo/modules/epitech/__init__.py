@@ -125,7 +125,7 @@ class Registrations(frobo.Cog):
             token = self.config.get('epitech.intra.token')
             data = None
             async with aiohttp.ClientSession() as session:
-                async with session.get(f'https://intra.epitech.eu/auth-{token}/user/{user.azure}?format=json') as resp:
+                async with session.get(f'https://intra.epitech.eu/auth-{token}/user/{user.azure}/?format=json') as resp:
                     data = await resp.json()
                     if 'error' not in data:
                         profiles.append(data)

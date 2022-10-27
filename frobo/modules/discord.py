@@ -351,7 +351,9 @@ class Roles(frobo.Cog):
                 matched = matched and do_test(real_value, condition.cond, condition.value)
             if matched:
                 to_apply.setdefault(rule.guild, set()).add(rule.role)
-                to_unapply.setdefault(rule.guild, set()).remove(rule.role)
+                tug = to_unapply.setdefault(rule.guild, set())
+                if rule.role in tug:
+                    tug.remove(rule.role)
 
         for guild_id in set(itertools.chain(to_apply.keys(), to_unapply.keys())):
             guild = self.client.client.get_guild(guild_id)
